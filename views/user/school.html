@@ -1,0 +1,159 @@
+<template>
+	<div>
+		<div class="breadcrumb">
+			<span>家庭列表</span>
+		</div>
+		<div class="row">
+			<button class="button primary" data-bind="click: add">添加学校</button>
+			<button class="button" data-bind="click: del, enable: canDelete, css: { 'disabled': !canDelete() }">删除</button>
+		</div>
+		<table class="list-table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+                <tr>
+                    <th width="40px"><input type="checkbox" name="select"/></th>
+                    <th>集团名称</th>
+                    <th>人数</th>
+                    <th>管理员</th>
+                    <th width="120px">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            		<!-- ko foreach: list -->
+                <tr>
+                		<td data-bind="css:{ 'highlight': $index() % 2 == 1 }"><input type="checkbox" name="select" data-bind="value: tegr_id"/></td>
+                    <td data-bind="text: tegr_name, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="text: totalCount, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="text: name, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="css:{ 'highlight': $index() % 2 == 1 }">
+                        <a class="edit" data-bind="click: $parent.edit">编辑</a>
+                        <a class="sub" data-bind="click: $parent.sub">管理</a>
+                    </td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko if: list().length == 0 -->
+                <tr>
+                		<td colspan="20" class="nodata">
+                			暂无数据
+                		</td>
+                </tr>
+                <!-- /ko -->
+            </tbody>
+        </table>
+        <form style="width: 380px;display: none;">
+	        <input type="hidden" name="tegr_id" data-bind="value: formData().tegr_id" />
+	        <div class="row line">
+	            <label class="field">名称:</label>
+	            <input class="input" type="text" name="tegr_name" placeholder="请输入集团名称" data-bind="value: formData().tegr_name" />
+	        </div>
+	    </form>
+	</div>
+</template>
+<script>
+	function(){
+		var el = $(this.$el);
+		var user = this.$user;
+		var emptyData = { tegr_id: 0, tegr_name: "" };
+		var vm = {
+			canDelete: ko.observable(false),
+			list: ko.observableArray([]),
+			formData: ko.observable(emptyData),
+			
+			add: onAdd,
+			edit: onEdit,
+			del: onDel,
+			sub: onSub
+		}
+//		vm.list.push({ tegr_id: 1, tegr_name: "管理员", totalCount: 32, name: "admin" });
+//		vm.list.push({ tegr_id: 2, tegr_name: "宋江", totalCount: 32, name: "18822884455" });
+//		vm.list.push({ tegr_id: 3, tegr_name: "刘伯温", totalCount: 32, name: "18822884455" });
+//		vm.list.push({ tegr_id: 4, tegr_name: "花木兰", totalCount: 32, name: "18822884455" });
+//		vm.list.push({ tegr_id: 5, tegr_name: "慕容", totalCount: 32, name: "18822884455" });
+//		vm.list.push({ tegr_id: 6, tegr_name: "刘邦", totalCount: 32, name: "18822884455" });
+//		vm.list.push({ tegr_id: 7, tegr_name: "张飞", totalCount: 32, name: "18822884455" });
+//		vm.list.push({ tegr_id: 8, tegr_name: "诸葛亮", totalCount: 32, name: "18822884455" });
+		ko.applyBindings(vm, this.$el);
+		queryData();
+		
+		function queryData() {
+			$.post(HTTP_SERVER + "tegrApi/getTegrList", { user_id: user.user_id }, function(rst) {
+				if(rst) {
+					if(rst.code == 200 && rst.returnObject && rst.returnObject.length > 0) {
+						vm.list(rst.returnObject);
+						return;
+					} else if(rst.msg) {
+						layer.msg(rst.msg, {icon: 5});		
+						return;
+					}
+				}
+				layer.msg("加载集团用户失败", {icon: 5});
+			}, 'json').fail(function() {
+				layer.msg("服务器端错误，请稍后再试", {icon: 5});
+			});
+		}
+		
+		var dataGrid = new DataGrid($(".list-table", el));
+		dataGrid.change(function(evt) {
+			vm.canDelete(evt.result);
+		});
+		
+		var form = $("form", el);
+		function openDailog(title) {
+            layer.open({
+                title: title,
+                type: 1,
+                content: form,
+                area: "400px",
+                btn: ["保存", "取消 "],
+                yes: function (index) {
+                    layer.close(index);
+                    $.post("../API.asmx/saveUser", data, function (data) {
+                        if (data && data.rst) {
+                            layer.msg('保存成功');
+                            refresh();
+                        } else {
+                            layer.msg('保存失败', { icon: 5 });
+                        }
+                    }, "json").fail(function () {
+                        layer.msg('保存失败', { icon: 5 });
+                    });
+                }
+            });
+        }
+		
+		function onEdit(obj) {
+			
+			vm.formData(obj);
+			openDailog("编辑用户");
+		}
+		
+		function onAdd() {
+			vm.formData(emptyData);
+			openDailog("添加用户");
+		}
+		
+		function onDel() {
+			var id = this.id;
+            layer.confirm('你是否删除当前记录？', {
+                btn: ['确定', '不，我再等等'] //按钮
+            }, function () {
+                var data = { id: id  }
+                $.post("../API.asmx/deleteUser", data, function (data) {
+                    if (data && data.rst) {
+                        layer.msg('删除成功');
+                        refresh();
+                    } else {
+                        layer.msg('删除失败', { icon: 5 });
+                    }
+                }, "json").fail(function () {
+                    layer.msg('删除失败', { icon: 5 });
+                });
+            }, function () {});
+        
+			console.log(dataGrid.getSelectedValues());
+		}
+		
+		function onSub() {
+			
+		}
+	}
+</script>

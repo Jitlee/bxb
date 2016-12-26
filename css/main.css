@@ -1,0 +1,329 @@
+﻿body, html {
+    padding: 0px;
+    margin: 0px;
+    color: #333;
+    font-size: 14px;
+}
+
+/** 公共样式 **/
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
+}
+
+.clear {
+	clear: both;
+	height: 0px;
+	display: block;
+	border: 0;
+	margin: 0;
+	pdding: 0;
+}
+
+input[type=text] {
+	font-size: 12px;
+	border: solid 1px #ccc;
+	padding: 0px;
+	margin: 0px;
+	text-indent: 8px;
+	line-height: 25px;
+	height: 26px;
+}
+
+input[type=checkbox],input[type=radio] {
+	font-size: 16px;
+}
+
+/** 按钮样式 **/
+.button {
+    display: inline-block;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    background: #fff;
+    border: 1px solid #c0ccda;
+    color: #1f2d3d;
+    -webkit-appearance: none;
+    text-align: center;
+    box-sizing: border-box;
+    outline: none;
+    margin: 0;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 4px
+}
+
+..button+.button {
+    margin-left: 10px
+}
+
+.button:focus,.button:hover {
+    color: #20a0ff;
+    border-color: #20a0ff
+}
+
+.button:active {
+    color: #1d90e6;
+    border-color: #1d90e6;
+    outline: none
+}
+
+.button::-moz-focus-inner {
+    border: 0
+}
+
+.button.primary {
+    color: #fff;
+    background-color: #20a0ff;
+    border-color: #20a0ff
+}
+
+.button.primary:focus,.button.primary:hover {
+    background: #4db3ff;
+    border-color: #4db3ff;
+    color: #fff
+}
+
+.button.primary:active {
+    outline: none
+}
+
+.button.primary.active,.button.primary:active {
+    background: #1d90e6;
+    border-color: #1d90e6;
+    color: #fff
+}
+
+.button.disabled, .button.disabled:focus, .button.disabled:hover {
+    color: #c0ccda;
+    cursor: not-allowed;
+    background-image: none;
+    background-color: #eff2f7;
+    border-color: #d3dce6;
+}
+
+/** 导航 **/
+
+.nav {
+	position: relative;
+}
+
+.header {
+	height: 30px;
+	line-height: 30px;
+	padding: 0 10px;
+	color: #fff;
+	background-color: #333;
+	font-size: 12px;
+	cursor: default;
+}
+
+.header a.nickname {
+	color: #e17d1f;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.header a.link {
+	color: #999;
+	cursor: pointer;
+	cursor: pointer;
+}
+
+.top-nav {
+	position: relative;
+	background-color: #e17d1f;
+	background-image: url(../img/nav-bg.jpg);
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+}
+
+.top-nav-menu {
+	display: block;
+	position: relative;
+	height: 88px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	padding-left: 45px;
+}
+
+.top-nav-menu-item {
+	margin: 0 45px 0 0;
+	padding: 8px 0;
+	width: 92px;
+	height: 88px;
+	background-repeat: no-repeat;
+	/*background-position: 50% 50%;*/
+	cursor: pointer;
+	text-align: center;
+	color: #fff;
+	
+	float: left;
+}
+
+.top-nav-menu-nav {
+	font-size: 14px;
+}
+
+.top-nav-menu-img {
+	width: 45px;
+	height: 45px;
+}
+
+.top-nav-menu-text {
+	padding: 0;
+	margin: 0;
+	line-height: 25px;
+}
+
+.top-nav-menu-item.selected {
+	background-image: url(../img/top-btn-selected.png);
+	color: #2af;
+}
+
+.top-sub-menu {
+	margin: 0;
+	padding: 0;
+	height: 40px;
+	line-height: 40px;
+	
+	background-color: #febf00;
+	list-style: none;
+	padding-left: 45px;
+}
+
+.top-sub-menu-item {
+	display: block;
+	zoom: *;
+	float: left;
+	color: #999;
+}
+
+.top-sub-menu-nav {
+	display: block;
+	zoom: *;
+	padding: 0 25px;
+	cursor: pointer;
+}
+
+.top-sub-menu-item.selected {
+	color: #2af;
+}
+
+/** 主体内容 **/
+.content {
+	padding: 10px;
+}
+
+.breadcrumb {
+    background-color: #f7f7f7;
+    padding: 10px;
+}
+
+/* 表格样式 */
+.list-table {
+    width: 100%;
+    font-size: 14px;
+    color: #333;
+    text-align: center;
+    cursor: pointer;
+}
+
+.list-table th {
+    background-color: #fff3e1;
+}
+
+.list-table td, table.list-table th {
+    padding: 10px;
+    5px;
+}
+
+.list-table td.highlight {
+    background-color: #fce9d8;
+}
+
+.list-table td.nodata {
+	text-algin: center;
+	padding: 30px;
+	color: #666;	
+	border:solid 1px #f0f0f0; 
+}
+
+.list-table a.del, .list-table a.edit, .list-table a.sub {
+    color: #fff;
+    display: inline-block;
+    zoom: *;
+    padding: 3px 6px;
+    font-size: 14px;
+}
+
+.list-table a.del {
+    background-color: #f20;
+}
+
+.list-table a.edit {
+    background-color: #2af;
+}
+
+.list-table a.sub {
+    background-color: #139e13;
+}
+
+.list-table a.del.disabled, .list-table a.edit.disabled, .list-table a.sub.disabled {
+    color: #999;
+    background-color: #e0e0e0;
+}
+
+.list-pager {
+    font-size: 14px;
+    text-align: right;
+    padding: 3px;
+    color: #333;
+}
+
+.list-pager a {
+    cursor: pointer;
+    color: #ee7600;
+    padding: 2px;
+    width: 20px;
+    text-align: center;
+}
+
+.list-pager a.disabled {
+    cursor: default;
+    color: #333;
+}
+
+/* 行元素 */
+.row {
+	display: block;
+	padding: 10px 0;
+	position: relative;
+}
+
+.row.line, .row.inline {
+    padding-left: 90px;
+}
+
+.row.line .field, .row.inline .field {
+	position: absolute;
+    left: 0px;
+    top: 17px;
+    width: 80px;
+    text-align: right;
+}
+
+.row.line .input {
+	width:100%;
+}
+
+

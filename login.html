@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+    		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>幼儿安全健康管理</title>
+		<link href="css/login.css" rel="stylesheet" type="text/css" />
+	</head>
+	<body>
+		<nav class="top-nav">
+			<img src="img/tb.png" />
+			<span>欢迎登陆后台管理界面平台</span>
+		</nav>
+		
+		<section class="panel">
+			<header class="panel-header">
+				伴小宝<br />幼儿安全健康管理
+			</header>
+			<section class="panel-content">
+				<form>
+					<div class="title">用户登录<span>&nbsp;&nbsp;TeacherLogin</span></div>
+					<div class="input-row">
+						<i class="img img-user"></i>
+						<input id="username" type="text"/>
+					</div>
+					<div class="input-row">
+						<i class="img img-locked"></i>
+						<input id="password" type="password"/>
+					</div>
+					<a id="submitButton" class="button" style="margin-top: 18px">确定</a>
+				</form>
+			</section>
+		</section>
+		<footer class="footer">
+			<div class="footer-box">
+				版权所有
+			</div>
+		</footer>
+		
+		<script type="text/javascript" src="lib/jquery/jquery-3.1.1.min.js"></script>
+		<script type="text/javascript" src="js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="lib/md5/md5.min.js"></script>
+	    <script type="text/javascript" src="lib/layer/layer.js"></script>
+	    <script type="text/javascript" src="js/config.js"></script>
+	    <script type="text/javascript" src="js/app.js"></script>
+		<script type="text/javascript">
+			layer.tips('默认就是向右的', '#id或者.class');
+			
+			$("#submitButton").click(function() {
+				var username = $.trim($("#username").val());
+				var password = $("#password").val();
+				
+				if(!username) {
+					layer.tips('请输入用户名', '#username');
+					return;
+				}
+				
+				if(!password) {
+					layer.tips('请输入密码', '#password');
+					return;
+				}
+				
+				$.post(HTTP_SERVER + "userApi/loginBackstage", { username: username, password: md5(password) }, function(rst) {
+					if(rst) {
+						if(rst.code == 200 && rst.returnObject) {
+							App.setUser(rst.returnObject);
+							App.path("index.html");
+							return;
+						} else if(rst.msg) {
+							layer.msg(rst.msg, {icon: 5});		
+							return;
+						}
+					}
+					layer.msg("登录失败，请稍后再试", {icon: 5});
+				}, 'json').fail(function() {
+					layer.msg("服务器端错误，请稍后再试", {icon: 5});
+				});
+				
+			});
+		</script>
+	</body>
+</html>

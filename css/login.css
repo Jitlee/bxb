@@ -1,0 +1,166 @@
+body, html {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	background-image: url(../img/bg.jpg);
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: 50% 50%;
+	background-color: #ed7e22;
+	
+	vertical-align: middle;
+}
+
+.top-nav {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	background-color: #000;
+    opacity: 0.5;
+    filter: Alpha(opacity=50);
+}
+
+.top-nav img {
+	margin-left: 20px;
+	margin-right: 10px;
+	height: 20px;
+	width: 20px;
+	vertical-align: middle;
+}
+
+.top-nav span {
+    color: #fff;
+    font-size: 12px;
+	vertical-align: middle;
+}
+
+.panel {
+	width: 680px;
+	margin: auto;
+	padding-top: 110px;
+	display: block;
+	/*height: 424px;*/
+}
+
+.panel-header {
+	display: block;
+	font-size: 22px;
+	color: #fff;
+	background-image: url(../img/logo.png);
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+	padding-top: 17px;
+	padding-bottom: 17px;
+	padding-left: 105px;
+	margin-bottom: 10px;
+}
+
+.panel-content {
+	background-image: url(../img/login-bg.png);
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+	height: 322px;
+	
+	padding-left: 227px;
+	padding-top: 14px;
+}
+
+.panel-content form {
+	display: block;
+	background-color: #fff;
+	height: 273px;
+	
+	padding-left: 57px;
+	padding-top: 35px;
+}
+
+.panel-content .title {
+	font-size: 22px;
+    color: #f47e0d;
+}
+
+.panel-content .title span {
+	font-size: 18px;
+    color: #c3c5c6;
+}
+
+.input-row {
+	position: relative;
+}
+
+.input-row i.img {
+	width: 32px;
+    height: 32px;
+	
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+    
+    position: absolute;
+    left: 6px;
+    top: 36px;
+}
+
+.input-row i.img-user {
+	background-image: url(../img/user.png);
+}
+
+.input-row i.img-locked {
+	background-image: url(../img/locked.png);
+}
+
+.input-row input {
+	height: 48px;
+	width: 343px;
+	margin-top: 28px;
+	
+	border: 0;
+    text-indent: 44px;
+    font-size: 14px;
+    color: #000;
+	
+	background-image: url(../img/input.png);
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+}
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 60px;
+	line-height: 60px;
+	
+	background: #e48830;
+}
+
+.footer-box {
+	margin: auto;
+	width: 434px;
+	
+	color:#fff;
+	font-size: 12px;
+}
+
+.button {
+	width: 111px;
+    height: 35px;
+    line-height: 35px;
+    background: #f0580c;
+    border-radius: 3px;
+    text-align: center;
+    color: #fff;
+    font-size: 14px;
+   
+    display: block;
+    
+    cursor: default;
+}
