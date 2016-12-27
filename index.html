@@ -37,11 +37,22 @@
 					<li class="clear"></li>
 				</ul>
 			</nav>
+			
+			<div class="breadcrumb">
+				<span class="title" data-bind="text: title">系统用户列表</span>
+				<div class="crumbs" data-bind="foreach: crumbs">
+					<!-- ko if: $index() > 0 -->
+					<span class="split">/</span>
+					<!-- /ko -->
+					<a class="bread" data-bind="text: name">/</a>
+				</div>
+			</div>
 		</div>
 		<div id="router-view" class="content"></div>
 		<script type="text/javascript" src="lib/jquery/jquery-3.1.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery.cookie.js"></script>
 		<script type="text/javascript" src="lib/md5/md5.min.js"></script>
+		<script type="text/javascript" src="lib/moment/moment.min.js"></script>
 		<script type="text/javascript" src="lib/ko/knockout-3.4.1.js"></script>
 	    <script type="text/javascript" src="lib/layer/layer.js"></script>
 	    <script type="text/javascript" src="js/config.js"></script>
@@ -49,47 +60,35 @@
 	    <script type="text/javascript" src="js/router.js"></script>
 	    <script type="text/javascript" src="js/mvc.js"></script>
 	    <script type="text/javascript" src="js/table.js"></script>
+	    <script type="text/javascript" src="js/pager.js"></script>
 	    <script type="text/javascript" src="router.config.js"></script>
 	    
 	    <script>
-	    		(function(){
+	    		(function(w){
 	    			var router = new Router("#router-view", getRoutes());
 	    			new Mvc(router);
 	    			router.replace("/user/system");
-	    		})();
+	    			w.$router = router;
+	    		})(window);
 	    </script>
 	    
 	    <script type="text/javascript">
 	    		(function(w, $, ko, app) {
 	    			var user = app.getUser();
-//	    			var menus = [
-//	    				{ 
-//	    					name: "用户管理", icon: "img/top-nav/device.png",
-//	    					menus: [
-//	    						{ name: "系统用户",  path: "/user/system" },
-//	    						{ name: "集团用户",  path: "/user/bloc" },
-//	    						{ name: "家庭用户",  path: "/" }
-//	    					]
-//	    				},
-//	    				{ name: "设备管理", icon: "img/top-nav/device.png", path: "/" },
-//	    				{ name: "商城管理", icon: "img/top-nav/device.png", path: "/" },
-//	    				{ name: "讲堂管理", icon: "img/top-nav/device.png", path: "/" },
-//	    				{ name: "报表管理", icon: "img/top-nav/device.png", path: "/" },
-//	    			];
 				
-				var routes = w.getRoutes();
+				var routes = w.$router.routes;
 				
 				var menus = [];
-				var menu;
+				var menu = null;
 				for(var i = 0, ilen = routes.length; i < ilen; i++) {
-					if(routes[i].hide !== true) {
+					if(routes[i].hidden !== true) {
 						menu = routes[i];
 						menu.menus = [];
 						menus.push(routes[i]);
 						
 						if(menu.children) {
 							for(var j = 0, jlen = menu.children.length; j < jlen; j++) {
-								if(menu.children[j] !== true) {
+								if(menu.children[j].hidden !== true) {
 									menu.menus.push(menu.children[j]);
 								}
 							}
@@ -98,11 +97,22 @@
 				}
 				
 	    			var vm = {
+	    				title: ko.observable("后台管理系统"),
+	    				crumbs: ko.observableArray([]),
 	    				user: app.getUser(),
 	    				menus: menus,
 	    				submenus: ko.observableArray(menus[0].menus.slice())
 	    			};
 	    			ko.applyBindings(vm, app("nav"));
+	    			
+	    			if(w.$router.current) {
+	    				vm.title(w.$router.current.name);
+	    				vm.crumbs(w.$router.current.mathes);
+	    			}
+	    			w.$router.watch(function(router) {
+	    				vm.title(router.name);
+	    				vm.crumbs(router.mathes);
+	    			});
 	    			
 	    			var nav = $("#nav");
 	    			var topNavMenu = $(".top-nav-menu", nav).on("click", "li", function(evt) {

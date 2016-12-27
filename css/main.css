@@ -23,6 +23,7 @@
 	pdding: 0;
 }
 
+/** 输入框 **/
 input[type=text] {
 	font-size: 12px;
 	border: solid 1px #ccc;
@@ -36,6 +37,11 @@ input[type=text] {
 input[type=checkbox],input[type=radio] {
 	font-size: 16px;
 }
+
+input[type=text].validate,input[type=radio].validate,input[type=checkbox].validate {
+	border-color: #ffcbcb;
+}
+
 
 /** 按钮样式 **/
 .button {
@@ -195,6 +201,9 @@ input[type=checkbox],input[type=radio] {
 	padding: 0;
 	height: 40px;
 	line-height: 40px;
+
+	white-space: nowrap;
+	overflow: hidden;
 	
 	background-color: #febf00;
 	list-style: none;
@@ -227,6 +236,31 @@ input[type=checkbox],input[type=radio] {
 .breadcrumb {
     background-color: #f7f7f7;
     padding: 10px;
+    margin: 10px 10px 0 10px;
+    font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.breadcrumb .title {
+	font-size: 19px;
+	font-weight: 400;
+}
+
+.breadcrumb .crumbs {
+	float: right;
+	font-size: 13px;
+}
+
+.breadcrumb .crumbs .bread {
+	color: #475669;
+}
+
+.breadcrumb .crumbs .split {
+	color: #c0ccda;
+}
+
+.breadcrumb .crumbs .bread:last-child {
+	color: #99a9bf;
 }
 
 /* 表格样式 */

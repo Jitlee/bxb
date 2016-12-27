@@ -13,7 +13,14 @@
 				{
 					path: "/bloc",
 					name: "集团列表",
-					template: "views/user/bloc.html"
+					template: "views/user/bloc.html",
+					children: [
+						{
+							path: "/mgr/:blocId",
+							name: "集团用户列表",
+							template: "views/user/bloc/mgr.html"
+						}
+					]
 				},
 				{
 					path: "/school",
@@ -50,22 +57,22 @@
 				{
 					path: "/group",
 					name: "设备组列表",
-					template: "view/device/group.html"
+					template: "views/device/group.html"
 				},
 				{
 					path: "/wristband",
 					name: "手环列表",
-					template: "view/device/wristband.html"
+					template: "views/device/wristband.html"
 				},
 				{
 					path: "/ruler",
 					name: "身高尺",
-					template: "view/device/ruler.html"
+					template: "views/device/ruler.html"
 				},
 				{
 					path: "/scale",
 					name: "健康秤",
-					template: "view/device/scale.html"
+					template: "views/device/scale.html"
 				}
 			]
 		},
@@ -77,12 +84,12 @@
 				{
 					path: "/goods",
 					name: "商品列表",
-					template: "view/mall/goods.html"
+					template: "views/mall/goods.html"
 				},
 				{
 					path: "/order",
 					name: "订单列表",
-					template: "view/mall/order.html"
+					template: "views/mall/order.html"
 				},
 			]
 		},
@@ -94,7 +101,7 @@
 				{
 					path: "/list",
 					name: "课堂列表",
-					template: "view/lesson/list.html"
+					template: "views/lesson/list.html"
 				}
 			]
 		},
@@ -106,7 +113,7 @@
 				{
 					path: "/student",
 					name: "学生报表列表",
-					template: "view/report/student.html"
+					template: "views/report/student.html"
 				}
 			]
 		}

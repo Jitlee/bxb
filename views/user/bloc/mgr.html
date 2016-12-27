@@ -1,0 +1,16 @@
+<template>
+	<div>
+		集团tegr_id：
+		<span data-bind="text: blocId"></span>
+	</div>
+</template>
+<script>
+	function(){
+		var el = $(this.$el);
+		var user = this.$user;
+		vm = { 
+			blocId: this.$params.blocId
+		}
+		ko.applyBindings(vm, this.$el);
+	}
+</script>

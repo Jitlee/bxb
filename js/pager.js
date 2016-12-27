@@ -2,9 +2,9 @@
     var PAGE_SIZE = 15; // 分页大小
     var MAX_DISPLAY_PAGE_COUNT = 8; // 显示的页码最大数量
 
-    function Pager(element, url) {
-        var params = { pageSize: PAGE_SIZE };
-        var vm = {
+    function Pager(vm, url) {
+        var params = { page_size: PAGE_SIZE, last_req_time: 0 };
+        $.extend(vm, {
             pageNo: ko.observable(1), // 当前页码（从1开始）
             pageSize: PAGE_SIZE, // 分页大小
             recordCount: ko.observable(0), // 数据条数
@@ -18,49 +18,24 @@
             gotoFirst: onGotoFirst, // 首页
             gotoPage: onGotoPage, // 跳转
             gotoLast: onGotoLast // 尾页
-        };
-
-        ko.applyBindings(vm, element);
+        });
 
         function page() {
             layer.load();
-            params.pageNo = vm.pageNo();
-            $.getJSON(url, params, function (data) {
+            params.page = vm.pageNo();
+            App.get(url, params, function (data) {
                 layer.closeAll('loading');
-                if (!(data && data.code == 200)) {
-                    vm.list.removeAll();
-                    renderPages({ list: [], recordCount: 0 });
-                    if (data.code == 401) {
-                        window.location.href = "../login.html";
-                    } if (data.code == 403) {
-                        layer.alert('注册码不对，请联系技术人员！', {
-                            closeBtn: 0
-                        }, function () {
-                            return true;
-                        });
-                    }
-                    return;
-                }
-
-                var rst = data.rst;
-                if (rst && rst.list.length > 0) {
-				    // 绑定列表
-			        vm.list(rst.list);
-			    } else {
-				    vm.list.removeAll();
+                if(data) {
+	                params.last_req_time = data.last_req_time;
+				    renderPages(data.total_count);
 			    }
-			    renderPages(rst);
-            }).fail(function () {
-                layer.closeAll('loading');
-		        vm.list.removeAll();
-		        renderPages({ list: [], recordCount: 0 });
-		    });
+            })
 	    }
 	
-	    function renderPages(data) {
+	    function renderPages(recordCount) {
 		    var pageNo = vm.pageNo();
-		    var pageCount = Math.ceil(data.recordCount / PAGE_SIZE);
-		    vm.recordCount(data.recordCount);
+		    var pageCount = Math.ceil(recordCount / PAGE_SIZE);
+		    vm.recordCount(recordCount);
 		    vm.pageCount(pageCount);
 		
 		    var pages = [];
