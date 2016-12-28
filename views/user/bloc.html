@@ -24,7 +24,7 @@
                     <td data-bind="css:{ 'highlight': $index() % 2 == 1 }">
                         <a class="edit" data-bind="click: $parent.edit">编辑</a>
                         <a class="del" data-bind="click: $parent.del">删除</a>
-                        <a class="sub" data-bind="attr: { vpath: '/user/bloc/mgr/' + tegr_id }">管理</a>
+                        <a class="sub" data-bind="attr: { rpath: '/user/bloc/mgr/school/' + tegr_id, rtitle: tegr_name }">管理</a>
                     </td>
                 </tr>
                 <!-- /ko -->
@@ -92,10 +92,11 @@
                     		return;
                     }
                     
-                    layer.close(index);
-                    
                     App.post("tegrApi/addTegr", formData, function (data) {
-                       data &&  queryData()
+                    		if(data) {
+                    			layer.close(index);
+                        		queryData();
+                        }
                     }, "保存");
                 }
             });

@@ -5,6 +5,10 @@
     font-size: 14px;
 }
 
+router-view {
+	display: block;
+}
+
 /** 公共样式 **/
 .left {
 	float: left;
@@ -41,7 +45,6 @@ input[type=checkbox],input[type=radio] {
 input[type=text].validate,input[type=radio].validate,input[type=checkbox].validate {
 	border-color: #ffcbcb;
 }
-
 
 /** 按钮样式 **/
 .button {
@@ -112,6 +115,40 @@ input[type=text].validate,input[type=radio].validate,input[type=checkbox].valida
     background-image: none;
     background-color: #eff2f7;
     border-color: #d3dce6;
+}
+
+/** tab 样式 **/
+ul.tab{
+	list-style: none;
+	margin: 0;
+	padding:8px 20px;
+	color:0px;
+	background-color: rgb(255,243,244);
+}
+
+ul.tab li.tab-item, ul.tab li.tab-item a{
+	display: inline-block;
+	zoom: *;
+}
+
+ul.tab li.tab-item a {
+	text-align: center;
+	width:100px;
+	line-height: 30px;
+	height: 30px;
+	cursor:pointer;
+	text-decoration: none;
+	color: #333;
+}
+
+ul.tab li.tab-item a:hover {
+	background-color: rgb(255,2434,244);
+}
+
+ul.tab li.tab-item a.selected {
+	color: #fff;
+	background-color: rgb(255,144,11);
+	cursor:default;
 }
 
 /** 导航 **/
@@ -233,12 +270,34 @@ input[type=text].validate,input[type=radio].validate,input[type=checkbox].valida
 	padding: 10px;
 }
 
+/** 导航栏 **/
 .breadcrumb {
     background-color: #f7f7f7;
     padding: 10px;
     margin: 10px 10px 0 10px;
     font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,SimSun,sans-serif;
     -webkit-font-smoothing: antialiased;
+    position: relative;
+    text-align: center;
+}
+
+.breadcrumb a.back {
+	cursor: default;
+	position: absolute;
+	left: 10px;
+	top: 10px;
+	line-height: 30px;
+	font-size: 15px;
+	text-indent: 20px;
+	display: block;
+	background-image: url(../img/back.png);
+	background-position: 0 50%;
+	background-repeat: no-repeat;
+}
+
+.breadcrumb a.back:hover {
+	color: #1296db;
+	background-image: url(../img/back-hover.png);
 }
 
 .breadcrumb .title {
@@ -247,8 +306,11 @@ input[type=text].validate,input[type=radio].validate,input[type=checkbox].valida
 }
 
 .breadcrumb .crumbs {
-	float: right;
+	position: absolute;
+	right: 15px;
+	top: 10px;
 	font-size: 13px;
+	line-height: 30px;
 }
 
 .breadcrumb .crumbs .bread {
@@ -269,11 +331,12 @@ input[type=text].validate,input[type=radio].validate,input[type=checkbox].valida
     font-size: 14px;
     color: #333;
     text-align: center;
-    cursor: pointer;
+    cursor: default;
 }
 
 .list-table th {
     background-color: #fff3e1;
+    cursor: pointer;
 }
 
 .list-table td, table.list-table th {

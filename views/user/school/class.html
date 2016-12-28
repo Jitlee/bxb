@@ -1,29 +1,32 @@
 <template>
 	<div>
+		<!-- ko if: schoolId > 0 -->
 		<div class="row">
-			<button class="button primary" data-bind="click: add">添加教师</button>
+			<button class="button primary" data-bind="click: add">添加班级</button>
 			<button class="button" data-bind="enable: canDelete, css: { 'disabled': !canDelete() }">删除</button>
 		</div>
+		<!-- /ko -->
 		<table class="list-table" cellspacing="0" cellpadding="0" border="0">
             <thead>
                 <tr>
                     <th width="40px"><input type="checkbox" name="select"/></th>
-                    <th>姓名</th>
-                    <th>角色</th>
-                    <th>帐号</th>
-                    <th width="120px">操作</th>
+                    <th>学校名称</th>
+                    <th>班级名称</th>
+                    <th>管理员</th>
+                    <th width="150px">操作</th>
                 </tr>
             </thead>
             <tbody>
             		<!-- ko foreach: list -->
                 <tr>
-                		<td data-bind="css:{ 'highlight': $index() % 2 == 1 }"><input type="checkbox" name="select" data-bind="value: user_id"/></td>
+                		<td data-bind="css:{ 'highlight': $index() % 2 == 1 }"><input type="checkbox" name="select" data-bind="value: class_id"/></td>
+                    <td data-bind="text: school_name, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="text: class_name, css:{ 'highlight': $index() % 2 == 1 }"></td>
                     <td data-bind="text: name, css:{ 'highlight': $index() % 2 == 1 }"></td>
-                    <td data-bind="text: App.formatRole(role_type), css:{ 'highlight': $index() % 2 == 1 }"></td>
-                    <td data-bind="text: username, css:{ 'highlight': $index() % 2 == 1 }"></td>
                     <td data-bind="css:{ 'highlight': $index() % 2 == 1 }">
                         <a class="edit" data-bind="click: $parent.edit">编辑</a>
                         <a class="del" data-bind="click: $parent.del">删除</a>
+                        <a class="sub" data-bind="attr: { rpath: '/user/bloc/schoolmgr/class/child/' + $parent.blocId + '/' +school_id + '/' + class_id, rtitle: class_name }">管理</a>
                     </td>
                 </tr>
                 <!-- /ko -->
@@ -48,33 +51,10 @@
         <!-- /ko -->
         
         <form style="width: 380px;display: none;">
-        		<input type="hidden" name="tegr_id" data-bind="value: formData().tegr_id"/>
-        		<input type="hidden" name="user_id" data-bind="value: formData().user_id"/>
+        		<input type="hidden" name="school_id" data-bind="value: formData().school_id"/>
 	        <div class="row line">
-	            <label class="field">用户名</label>
-	            <input class="input" type="text" name="username" placeholder="请输入用户名" data-bind="value: formData().username" require/>
-	        </div>
-	        <div class="row line">
-	            <label class="field">昵称</label>
-	            <input class="input" type="text" name="name" placeholder="请输入昵称" data-bind="value: formData().name" require/>
-	        </div>
-	        <div class="row inline">
-	            <label class="field">性别</label>
-            		<label><input name="sex" type="radio" value="0" data-bind="checked: sex" />男</label>
-            		<label><input name="sex" type="radio" value="1" data-bind="checked: sex" />女</label>
-	        </div>
-	        <div class="row line">
-	            <label class="field">生日</label>
-	            <input id="endDateTextBox" name="text" data-bind="value: moment(formData().birthay).format('YYYY年MM月DD日')" onclick="WdatePicker({dateFmt:'yyyy年MM月dd日'})"/>
-           		<img onclick="WdatePicker({el:'endDateTextBox'})" src="lib/my97/skin/datePicker.gif" width="16" height="22" align="absmiddle"/>
-	        </div>
-	        <div class="row line">
-	            <label class="field">头像</label>
-	            <input class="input" type="text" name="avatar" placeholder="请输入头像" data-bind="value: formData().avatar"/>
-	        </div>
-	        <div class="row line">
-	            <label class="field">个性签名</label>
-	            <input class="input" type="text" name="remark" placeholder="请输入个性签名" data-bind="value: formData().remark"/>
+	            <label class="field">班级名称</label>
+	            <input class="input" type="text" name="class_name" placeholder="请输入班级名称" data-bind="value: formData().class_name" require/>
 	        </div>
 	    </form>
 	</div>
@@ -83,25 +63,35 @@
 	function(){
 		var el = $(this.$el);
 		var user = this.$user;
-		var emptyData = { tegr_id: 0, user_id: 0, username: "", name: "", sex: "", birthay: new Date().getTime(), avatar: "", remark: "" };
+		var userId = user.user_id || 0;
+		var blocId = this.$params.blocId || 0;
+		var schoolId = this.$params.schoolId || 0;
+		var emptyData = { school_id: schoolId, class_name: "" };
 		var vm = {
 			canDelete: ko.observable(false),
 			formData: ko.observable(emptyData),
 			sex: ko.observable("0"),
+			blocId: blocId,
+			schoolId: schoolId,
 			
 			add: onAdd,
 			edit: onEdit,
 			del: onDel
 		};
 		
-		var pager = new Pager(vm, "teacherApi/getTeacherList");
+		var pager = new Pager(vm, "classApi/getClassList", { school_id: schoolId, tegr_id: blocId });
 		
 		ko.applyBindings(vm, this.$el);
 		
-		pager.setParams({
-			user_id: user.user_id,
-			tegr_id: user.tegr_id
-		});
+		queryData();
+		
+		function queryData(force) {
+			var pageNo = vm.pageNo();
+			if(force && vm.list().length == 1) {
+				vm.pageNo(Math.max(1, pageNo -1));	
+			}
+			pager.setParams({ last_req_time: 0 });
+		}
 		
 		var dataGrid = new DataGrid($(".list-table", el));
 		dataGrid.change(function(evt) {
@@ -110,9 +100,9 @@
 		
 		var form = $("form", el);
 		function openDailog(isInsert) {
-			var url = (isInsert? "userApi/addAdmin" : "userApi/editUserInfo");
+			var url = (isInsert? "classApi/addClass" : "classApi/editClass");
             layer.open({
-                title: isInsert ? "新增用户" : "编辑用户",
+                title: isInsert ? "新增班级" : "编辑班级",
                 type: 1,
                 content: form,
                 area: "400px",
@@ -124,11 +114,12 @@
                     		return;
                     }
                     
-                    layer.close(index);
-                    
                     App.post(url, formData, function (data) {
-                       data && queryData()
-                    }, "保存用户");
+                    		if(data) {
+                    			layer.close(index);
+                        		queryData();
+                        }
+                    }, "保存班级");
                 }
             });
         }
@@ -144,16 +135,16 @@
 		}
 		
 		function onDel(obj) {
-			var delete_user_id = obj.user_id;
+			var delete_class_id = obj.class_id;
             layer.confirm('你是否删除当前记录？', {
                 btn: ['确定', '不，我再等等'] //按钮
             }, function (index) {
             		layer.close(index);
-                App.post("teacherApi/deleteTeacher", {
+                App.post("classApi/deleteClass", {
                 		user_id: user.user_id,
-                		delete_user_id: delete_user_id
+                		delete_class_id: delete_class_id
                 }, function (data) {
-                		data && queryData();
+                		data && queryData(true);
                 }, "删除");
             }, function () {});
 		}

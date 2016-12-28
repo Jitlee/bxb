@@ -19,9 +19,13 @@
 		getUser: function() {
 			var json = $.cookie('user');
 			try {
-				return JSON.parse(json);
+				var user = JSON.parse(json);
+				if(user) {
+					return user;
+				}
 			} catch(e) { }
-			return null;
+			this.path("login.html");
+			return {};
 		},
 		clearUser: function() {
 			$.removeCookie('user');
@@ -73,7 +77,7 @@
                 		if(silent !== true) {
                     		layer.msg(title + '成功');
                     	}
-                		callback.call(this, rst.returnObject || true);
+                		callback.call(this, rst.result || rst.returnObject || true);
                 } else {
                 		callback.call(this, false);
                 		layer.msg(rst.msg || (title + '失败'), { icon: 5 });

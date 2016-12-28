@@ -1,0 +1,166 @@
+<template>
+	<div>
+		<!-- ko if: blocId > 0 -->
+		<div class="row">
+			<button class="button primary" data-bind="click: add">添加学校</button>
+			<button class="button" data-bind="enable: canDelete, css: { 'disabled': !canDelete() }">删除</button>
+		</div>
+		<!-- /ko -->
+		<table class="list-table" cellspacing="0" cellpadding="0" border="0">
+            <thead>
+                <tr>
+                    <th width="40px"><input type="checkbox" name="select"/></th>
+                    <th>集团名称</th>
+                    <th>学校名称</th>
+                    <th>会员人数比</th>
+                    <th>管理员</th>
+                    <th width="150px">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            		<!-- ko foreach: list -->
+                <tr>
+                		<td data-bind="css:{ 'highlight': $index() % 2 == 1 }"><input type="checkbox" name="select" data-bind="value: school_id"/></td>
+                    <td data-bind="text: tegr_name, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="text: school_name, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="css:{ 'highlight': $index() % 2 == 1 }">
+                    		<span data-bind="text: vipCount"></span>/<span data-bind="text: totalCount"></span>
+                    </td>
+                    <td data-bind="text: name, css:{ 'highlight': $index() % 2 == 1 }"></td>
+                    <td data-bind="css:{ 'highlight': $index() % 2 == 1 }">
+                        <a class="edit" data-bind="click: $parent.edit">编辑</a>
+                        <a class="del" data-bind="click: $parent.del">删除</a>
+                        <a class="sub" data-bind="attr: { rpath: '/user/bloc/schoolmgr/class/' + tegr_id +'/'+ school_id, rtitle: school_name }">管理</a>
+                    </td>
+                </tr>
+                <!-- /ko -->
+                <!-- ko if: list().length == 0 -->
+                <tr>
+                		<td colspan="20" class="nodata">
+                			暂无数据
+                		</td>
+                </tr>
+                <!-- /ko -->
+            </tbody>
+        </table>
+        <!-- ko if: list().length > 0 -->
+        <footer class="list-pager">
+            共<span data-bind="text: recordCount"></span>条记录，当前显示第<span data-bind="text: pageNo"></span>页
+            <a data-bind="click: gotoFirst, visible: pageCount() > 1">首页</a>
+            <!-- ko foreach: pages-->
+            <a data-bind="click: $parent.gotoPage, text: text, title: '跳转到第' + pageNo + '页', css: { 'disabled': $parent.pageNo() == pageNo }">首页</a>
+            <!-- /ko -->
+            <a data-bind="click: gotoLast, visible: pageCount() > 1">尾页</a>
+        </footer>
+        <!-- /ko -->
+        
+        <form style="width: 380px;display: none;">
+        		<input type="hidden" name="user_id" data-bind="value: formData().user_id"/>
+        		<input type="hidden" name="tegr_id" data-bind="value: formData().tegr_id"/>
+        		<input type="hidden" name="school_id" data-bind="value: formData().school_id"/>
+	        <div class="row line">
+	            <label class="field">学校名称</label>
+	            <input class="input" type="text" name="school_name" placeholder="请输入学校名称" data-bind="value: formData().school_name" require/>
+	        </div>
+	        <div class="row line">
+	            <label class="field">联系电话</label>
+	            <input class="input" type="text" name="school_call" placeholder="请输入学校联系电话" data-bind="value: formData().school_call" require/>
+	        </div>
+	        <div class="row line">
+	            <label class="field">联系人</label>
+	            <input class="input" type="text" name="school_person" placeholder="请输入学校联系人" data-bind="value: formData().school_person" require/>
+	        </div>
+	        <div class="row line">
+	            <label class="field">联系地址</label>
+	            <input class="input" type="text" name="school_address" placeholder="请输入学校联系地址" data-bind="value: formData().school_address" require/>
+	        </div>
+	    </form>
+	</div>
+</template>
+<script>
+	function(){
+		var el = $(this.$el);
+		var user = this.$user;
+		var userId = user.user_id || 0;
+		var blocId = this.$params.blocId || 0;
+		var emptyData = { user_id: user.user_id, tegr_id: blocId, school_name: "", school_call: "", school_person: "", school_address: "" };
+		var vm = {
+			canDelete: ko.observable(false),
+			formData: ko.observable(emptyData),
+			sex: ko.observable("0"),
+			blocId: blocId,
+			add: onAdd,
+			edit: onEdit,
+			del: onDel
+		};
+		
+		var pager = new Pager(vm, "schoolApi/getSchoolList", { user_id: userId, tegr_id: blocId });
+		
+		ko.applyBindings(vm, this.$el);
+		
+		queryData();
+		
+		function queryData(force) {
+			var pageNo = vm.pageNo();
+			if(force && vm.list().length == 1) {
+				vm.pageNo(Math.max(1, pageNo -1));	
+			}
+			pager.setParams({ last_req_time: 0 });
+		}
+		
+		var dataGrid = new DataGrid($(".list-table", el));
+		dataGrid.change(function(evt) {
+			vm.canDelete(evt.result);
+		});
+		
+		var form = $("form", el);
+		function openDailog(isInsert) {
+			var url = (isInsert? "schoolApi/addSchool" : "schoolApi/editSchool");
+            layer.open({
+                title: isInsert ? "新增学校" : "编辑学校",
+                type: 1,
+                content: form,
+                area: "400px",
+                btn: ["保存", "取消 "],
+                yes: function (index) {
+                    var formData = App.serialize(form);
+                    
+                    if(!formData) {
+                    		return;
+                    }
+                    
+                    layer.close(index);
+                    
+                    App.post(url, formData, function (data) {
+                       data && queryData()
+                    }, "保存教师");
+                }
+            });
+        }
+		
+		function onEdit(obj) {
+			vm.formData(obj);
+			openDailog(false);
+		}
+		
+		function onAdd() {
+			vm.formData(emptyData);
+			openDailog(true);
+		}
+		
+		function onDel(obj) {
+			var delete_school_id = obj.school_id;
+            layer.confirm('你是否删除当前记录？', {
+                btn: ['确定', '不，我再等等'] //按钮
+            }, function (index) {
+            		layer.close(index);
+                App.post("schoolApi/deleteSchool", {
+                		user_id: userId,
+                		delete_school_id: delete_school_id
+                }, function (data) {
+                		data && queryData();
+                }, "删除");
+            }, function () {});
+		}
+	}
+</script>

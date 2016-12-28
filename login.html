@@ -63,8 +63,8 @@
 				
 				$.post(HTTP_SERVER + "userApi/loginBackstage", { username: username, password: md5(password) }, function(rst) {
 					if(rst) {
-						if(rst.code == 200 && rst.returnObject) {
-							App.setUser(rst.returnObject);
+						if(rst.code == 200 && rst.result) {
+							App.setUser(rst.result);
 							App.path("index.html");
 							return;
 						} else if(rst.msg) {

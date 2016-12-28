@@ -2,8 +2,8 @@
     var PAGE_SIZE = 15; // 分页大小
     var MAX_DISPLAY_PAGE_COUNT = 8; // 显示的页码最大数量
 
-    function Pager(vm, url) {
-        var params = { page_size: PAGE_SIZE, last_req_time: 0 };
+    function Pager(vm, url, params) {
+        var params = $.extend({ page_size: PAGE_SIZE, last_req_time: 0 }, params);
         $.extend(vm, {
             pageNo: ko.observable(1), // 当前页码（从1开始）
             pageSize: PAGE_SIZE, // 分页大小
@@ -27,6 +27,11 @@
                 layer.closeAll('loading');
                 if(data) {
 	                params.last_req_time = data.last_req_time;
+	                if(data.list && data.list.length > 0) {
+	                		vm.list(data.list);
+	                	} else {
+	                		vm.list.removeAll();
+	                	}
 				    renderPages(data.total_count);
 			    }
             })

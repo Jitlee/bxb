@@ -13,19 +13,22 @@
 		var el = $(this.$el);
 		var user = this.$user;
 		var blocId = this.$params.blocId || 0;
+		var schoolId = this.$params.schoolId || 0;
 		vm = {
 			path: ko.observable("/user/bloc/mgr/school/" + blocId),
 			tabs: [
-				{ name:"学校列表", path: "/user/bloc/mgr/school/" + blocId },
-				{ name:"班级列表", path: "/user/bloc/mgr/class/" + blocId },
-				{ name:"教师列表", path: "/user/bloc/mgr/teacher/" + blocId },
-				{ name:"家长列表", path: "/user/bloc/mgr/parent/" + blocId }
+				{ name:"班级列表", path: "/user/bloc/schoolmgr/class/" + blocId + "/" + schoolId },
+				{ name:"学生列表", path: "/user/bloc/schoolmgr/child/" + blocId + "/" + schoolId }
 			]
 		}
 		ko.applyBindings(vm, this.$el);
 		
 		this.$router.watch(function(router) {
-			vm.path(router.realPath);
+			if(router.realPath.indexOf("child") > -1) {
+				vm.path(vm.tabs[1].path)
+			} else {
+				vm.path(router.realPath);
+			}
 		});
 	}
 </script>

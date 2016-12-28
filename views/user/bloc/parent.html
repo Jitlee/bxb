@@ -1,14 +1,17 @@
 <template>
 	<div>
+		<!-- ko if: childId > 0 -->
 		<div class="row">
-			<button class="button primary" data-bind="click: add">添加用户</button>
+			<button class="button primary" data-bind="click: add">添加家长</button>
 			<button class="button" data-bind="enable: canDelete, css: { 'disabled': !canDelete() }">删除</button>
 		</div>
+		<!-- /ko -->
 		<table class="list-table" cellspacing="0" cellpadding="0" border="0">
             <thead>
                 <tr>
                     <th width="40px"><input type="checkbox" name="select"/></th>
-                    <th>姓名</th>
+                    <th>学校</th>
+                    <th>家长昵称</th>
                     <th>角色</th>
                     <th>帐号</th>
                     <th width="120px">操作</th>
@@ -18,6 +21,7 @@
             		<!-- ko foreach: list -->
                 <tr>
                 		<td data-bind="css:{ 'highlight': $index() % 2 == 1 }"><input type="checkbox" name="select" data-bind="value: user_id"/></td>
+                    <td data-bind="text: school_name, css:{ 'highlight': $index() % 2 == 1 }"></td>
                     <td data-bind="text: name, css:{ 'highlight': $index() % 2 == 1 }"></td>
                     <td data-bind="text: App.formatRole(role_type), css:{ 'highlight': $index() % 2 == 1 }"></td>
                     <td data-bind="text: username, css:{ 'highlight': $index() % 2 == 1 }"></td>
@@ -36,8 +40,21 @@
                 <!-- /ko -->
             </tbody>
         </table>
+        <!-- ko if: list().length > 0 -->
+        <footer class="list-pager">
+            共<span data-bind="text: recordCount"></span>条记录，当前显示第<span data-bind="text: pageNo"></span>页
+            <a data-bind="click: gotoFirst, visible: pageCount() > 1">首页</a>
+            <!-- ko foreach: pages-->
+            <a data-bind="click: $parent.gotoPage, text: text, title: '跳转到第' + pageNo + '页', css: { 'disabled': $parent.pageNo() == pageNo }">首页</a>
+            <!-- /ko -->
+            <a data-bind="click: gotoLast, visible: pageCount() > 1">尾页</a>
+        </footer>
+        <!-- /ko -->
+        
         <form style="width: 380px;display: none;">
+        		<input type="hidden" name="tegr_id" data-bind="value: formData().tegr_id"/>
         		<input type="hidden" name="user_id" data-bind="value: formData().user_id"/>
+        		<input type="hidden" name="child_id" data-bind="value: formData().child_id"/>
 	        <div class="row line">
 	            <label class="field">用户名</label>
 	            <input class="input" type="text" name="username" placeholder="请输入用户名" data-bind="value: formData().username" require/>
@@ -53,7 +70,7 @@
 	        </div>
 	        <div class="row line">
 	            <label class="field">生日</label>
-	            <input id="endDateTextBox" name="birthday" data-bind="value: moment(formData().birthday).format('YYYY年MM月DD日')" onclick="WdatePicker({dateFmt:'yyyy年MM月dd日'})"/>
+	            <input id="endDateTextBox" name="text" data-bind="value: moment(formData().birthday).format('YYYY年MM月DD日')" onclick="WdatePicker({dateFmt:'yyyy年MM月dd日'})"/>
            		<img onclick="WdatePicker({el:'endDateTextBox'})" src="lib/my97/skin/datePicker.gif" width="16" height="22" align="absmiddle"/>
 	        </div>
 	        <div class="row line">
@@ -71,25 +88,34 @@
 	function(){
 		var el = $(this.$el);
 		var user = this.$user;
-		var emptyData = { user_id: 0, username: "", name: "", sex: "", birthday: new Date().getTime(), avatar: "", remark: "" };
+		var userId = user.user_id || 0;
+		var blocId = this.$params.blocId || 0;
+		var schoolId = this.$params.schoolId || 0;
+		var childId = this.$params.childId || 0;
+		
+		var emptyData = { tegr_id: blocId, school_id: schoolId, child_id: childId, user_id: 0, username: "", name: "", sex: "", birthday: new Date().getTime(), avatar: "", remark: "" };
 		var vm = {
 			canDelete: ko.observable(false),
-			list: ko.observableArray([]),
 			formData: ko.observable(emptyData),
 			sex: ko.observable("0"),
-			
+			childId: childId,
 			add: onAdd,
 			edit: onEdit,
 			del: onDel
-		}
+		};
+		
+		var pager = new Pager(vm, "parentApi/getParentList", { school_id: schoolId, tegr_id: blocId });
 		
 		ko.applyBindings(vm, this.$el);
+		
 		queryData();
 		
-		function queryData() {
-			App.get("userApi/getAdminList", { user_id: user.user_id }, function(data) {
-				data && 	vm.list(data);
-			}, "加载系统用户列表");
+		function queryData(force) {
+			var pageNo = vm.pageNo();
+			if(force && vm.list().length == 1) {
+				vm.pageNo(Math.max(1, pageNo -1));	
+			}
+			pager.setParams({ last_req_time: 0 });
 		}
 		
 		var dataGrid = new DataGrid($(".list-table", el));
@@ -99,9 +125,9 @@
 		
 		var form = $("form", el);
 		function openDailog(isInsert) {
-			var url = (isInsert? "userApi/addAdmin" : "userApi/editUserInfo");
+			var url = (isInsert? "parentApi/addParent" : "parentApi/editParent");
             layer.open({
-                title: isInsert ? "新增用户" : "编辑用户",
+                title: isInsert ? "新增家长" : "编辑家长",
                 type: 1,
                 content: form,
                 area: "400px",
@@ -116,13 +142,13 @@
                     	if(formData.birthday) {
                     		formData.birthday = moment(formData.birthday, "YYYY年MM月DD日").valueOf() / 1000;
                     	} 
-                    	
+                    
                     App.post(url, formData, function (data) {
                     		if(data) {
                     			layer.close(index);
                         		queryData();
                         }
-                    }, "保存用户");
+                    }, "保存家长");
                 }
             });
         }
@@ -138,16 +164,16 @@
 		}
 		
 		function onDel(obj) {
-			var delete_user_id = this.user_id;
+			var delete_user_id = obj.user_id;
             layer.confirm('你是否删除当前记录？', {
                 btn: ['确定', '不，我再等等'] //按钮
             }, function (index) {
             		layer.close(index);
-                App.post("userApi/deleteAdmin", {
+                App.post("parentApi/deleteParent", {
                 		user_id: user.user_id,
                 		delete_user_id: delete_user_id
                 }, function (data) {
-                		data && queryData();
+                		data && queryData(true);
                 }, "删除");
             }, function () {});
 		}

@@ -16,36 +16,67 @@
 					template: "views/user/bloc.html",
 					children: [
 						{
-							path: "/mgr/:blocId",
-							name: "集团用户列表",
-							template: "views/user/bloc/mgr.html"
+							path: "/bloc/mgr",
+							name: "集团管理",
+							template: "views/user/bloc/mgr.html",
+							children: [
+								{
+									path: "/school/:blocId",
+									name: "学校列表",
+									template: "views/user/bloc/school.html"
+								},
+								{
+									path: "/class/:blocId",
+									name: "班级列表",
+									template: "views/user/school/class.html"
+								},
+								{
+									path: "/teacher/:blocId",
+									name: "教师列表",
+									template: "views/user/bloc/teacher.html"
+								},
+								{
+									path: "/parent/:blocId",
+									name: "家长列表",
+									template: "views/user/bloc/parent.html"
+								}
+							]
+						},
+						{
+							path: "/bloc/schoolmgr",
+							name: "学校管理",
+							template: "views/user/school/mgr.html",
+							children: [
+								{
+									path: "/class/:blocId/:schoolId",
+									name: "班级列表",
+									template: "views/user/school/class.html",
+									children: [
+										{
+											path: "/bloc/schoolmgr/class/child/:blocId/:schoolId/:classId",
+											name: "学生列表",
+											template: "views/user/school/child.html",
+										}
+									]
+								}, {
+									path: "/child/:blocId/:schoolId",
+									name: "学生管理",
+									template: "views/user/school/child.html"
+								}
+							]
+						},
+						{
+							hidden: true,
+							path: "/bloc/parent/:blocId/:schoolId/:childId",
+							name: "家长列表",
+							template: "views/user/bloc/parent.html"
 						}
 					]
 				},
 				{
 					path: "/school",
 					name: "学校列表",
-					template: "views/user/school.html"
-				},
-				{
-					path: "/class",
-					name: "班级列表",
-					template: "views/user/class.html"
-				},
-				{
-					path: "/teacher",
-					name: "教师列表",
-					template: "views/user/teacher.html"
-				},
-				{
-					path: "/student",
-					name: "学生列表",
-					template: "views/user/student.html"
-				},
-				{
-					path: "/patriarch",
-					name: "家长列表",
-					template: "views/user/patriarch.html"
+					template: "views/user/bloc/school.html"
 				}
 			]
 		},

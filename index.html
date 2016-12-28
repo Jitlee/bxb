@@ -7,7 +7,7 @@
 		<title>幼儿安全健康管理</title>
 		<link href="css/main.css" rel="stylesheet" type="text/css" />
 	</head>
-	<body>
+	<body id="app">
 		<div id="nav" class="nav">
 			<header class="header">
 				<span>健康伴小宝后台管理平台</span>
@@ -19,7 +19,7 @@
 			<nav id="topNav" class="top-nav">
 				<ul class="top-nav-menu">
 					<!-- ko foreach: menus -->
-					<li class="top-nav-menu-item" data-bind="attr: { index: $index }, css: { selected: $index() == 0  }">
+					<li class="top-nav-menu-item" data-bind="attr: { index: $index, id: 'm' + __id }">
 						<a class="top-nav-menu-nav">
 							<img class="top-nav-menu-img" data-bind="attr: { src: icon }"/>
 							<p class="top-nav-menu-text" data-bind="text: name">用户管理</p>
@@ -30,7 +30,7 @@
 				</ul>
 				<ul class="top-sub-menu">
 					<!-- ko foreach: submenus -->
-					<li class="top-sub-menu-item" data-bind="attr: { index: $index, vpath: __path }, css: { selected: $index() == 0  }">
+					<li class="top-sub-menu-item" data-bind="attr: { index: $index, rpath: __path, id: 'm' + __id }">
 						<a class="top-sub-menu-nav" data-bind="text: name"></a>
 					</li>
 					<!-- /ko -->
@@ -39,6 +39,9 @@
 			</nav>
 			
 			<div class="breadcrumb">
+				<!-- ko if: canBack -->
+				<a class="back" rback>返回</a>
+				<!-- /ko -->
 				<span class="title" data-bind="text: title">系统用户列表</span>
 				<div class="crumbs" data-bind="foreach: crumbs">
 					<!-- ko if: $index() > 0 -->
@@ -48,13 +51,14 @@
 				</div>
 			</div>
 		</div>
-		<div id="router-view" class="content"></div>
+		<router-view class="content"></router-view>
 		<script type="text/javascript" src="lib/jquery/jquery-3.1.1.min.js"></script>
 		<script type="text/javascript" src="js/jquery.cookie.js"></script>
 		<script type="text/javascript" src="lib/md5/md5.min.js"></script>
 		<script type="text/javascript" src="lib/moment/moment.min.js"></script>
 		<script type="text/javascript" src="lib/ko/knockout-3.4.1.js"></script>
 	    <script type="text/javascript" src="lib/layer/layer.js"></script>
+	    <script type="text/javascript" src="lib/my97/WdatePicker.js"></script>
 	    <script type="text/javascript" src="js/config.js"></script>
 	    <script type="text/javascript" src="js/app.js"></script>
 	    <script type="text/javascript" src="js/router.js"></script>
@@ -65,7 +69,7 @@
 	    
 	    <script>
 	    		(function(w){
-	    			var router = new Router("#router-view", getRoutes());
+	    			var router = new Router("#app", getRoutes());
 	    			new Mvc(router);
 	    			router.replace("/user/system");
 	    			w.$router = router;
@@ -98,6 +102,7 @@
 				
 	    			var vm = {
 	    				title: ko.observable("后台管理系统"),
+	    				canBack: ko.observable(false),
 	    				crumbs: ko.observableArray([]),
 	    				user: app.getUser(),
 	    				menus: menus,
@@ -105,41 +110,56 @@
 	    			};
 	    			ko.applyBindings(vm, app("nav"));
 	    			
-	    			if(w.$router.current) {
-	    				vm.title(w.$router.current.name);
-	    				vm.crumbs(w.$router.current.mathes);
-	    			}
-	    			w.$router.watch(function(router) {
-	    				vm.title(router.name);
-	    				vm.crumbs(router.mathes);
-	    			});
-	    			
 	    			var nav = $("#nav");
 	    			var topNavMenu = $(".top-nav-menu", nav).on("click", "li", function(evt) {
 	    				var $this = $(this);
-	    				if($this.hasClass("selected")) {
+	    				initTopMenu($this);
+	    			});
+	    			
+	    			var topSubMenu = $(".top-sub-menu", nav).on("click", "li", function(evt) {
+	    				var $this = $(this);
+	    				initSubMenu($this);
+	    			});
+	    			
+	    			w.$router.watch(function(router) {
+	    				vm.title(router.title);
+	    				var matches = router.getMatches();
+	    				vm.crumbs(matches);
+	    				vm.canBack(this.history.length > 1);
+	    				if(router.matches.length > 0) {
+	    					var menu = $("#m" + router.matches[0].__id);
+	    					initTopMenu(menu);
+	    					if(router.matches.length > 1) {
+	    						var submenu = $("#m" + router.matches[1].__id);
+	    						initSubMenu(submenu);
+	    					}
+	    				}
+	    			});
+	    			
+	    			function initTopMenu(menu) {
+	    				if(menu.hasClass("selected")) {
 	    					return;
 	    				}
 	    				
 	    				$(".selected", topNavMenu).removeClass("selected");
-	    				$this.addClass("selected");
+	    				menu.addClass("selected");
 	    				
-	    				var index = Number($this.attr("index"));
+	    				var index = Number(menu.attr("index"));
 	    				if(index > -1 && index < menus.length && menus[index].menus) {
 	    					vm.submenus(menus[index].menus.slice());
 	    				} else {
 	    					vm.submenus.removeAll();
 	    				}
-	    			});
-	    			var topSubMenu = $(".top-sub-menu", nav).on("click", "li", function(evt) {
-	    				var $this = $(this);
-	    				if($this.hasClass("selected")) {
+	    			}
+	    			
+	    			function initSubMenu(menu) {
+	    				if(menu.hasClass("selected")) {
 	    					return;
 	    				}
 	    				
 	    				$(".selected", topSubMenu).removeClass("selected");
-	    				$this.addClass("selected");
-	    			});
+	    				menu.addClass("selected");
+	    			}
 	    			
 	    			$("#logout").click(function() {
 	    				app.clearUser();
